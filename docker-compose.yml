@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: articles-postgres
+    environment:
+      POSTGRES_USER: articles
+      POSTGRES_PASSWORD: articles
+      POSTGRES_DB: articles
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: articles-api
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - ./:/app
+    command: npm run start:dev
+
+volumes:
+  db-data:
