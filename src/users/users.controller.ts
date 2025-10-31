@@ -6,6 +6,8 @@ import {
   Param,
   Delete,
   Put,
+  NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './users.service';
 import { User } from '@prisma/client';
@@ -35,7 +37,11 @@ export class UserController {
 
   @Get(':id')
   async getUserById(@Param('id') id: string): Promise<User | null> {
-    return this.userService.getUserById(parseInt(id));
+    const user = await this.userService.getUserById(parseInt(id));
+    if (!user) {
+      throw new NotFoundException('Invalid user ID');
+    }
+    return user;
   }
 
   @Post()
@@ -53,6 +59,10 @@ export class UserController {
 
   @Delete(':id')
   async deleteUser(@Param('id') id: string): Promise<User> {
-    return this.userService.deleteUser(parseInt(id));
+    try {
+      return await this.userService.deleteUser(parseInt(id));
+    } catch (error) {
+      throw new BadRequestException('Invalid user ID');
+    }
   }
 }
