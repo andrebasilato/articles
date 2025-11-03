@@ -11,21 +11,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-
-class CreatePermissionDto {
-  name!: string;
-  description!: string;
-}
-
-class UpdatePermissionDto {
-  name?: string;
-  description?: string;
-}
+import { CreatePermissionDto } from './dto/create-permission.dto';
+import { UpdatePermissionDto } from './dto/update-permission.dto';
 
 import { Permissions } from 'src/auth/decorators/permissions.decorator';
 import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
 import { PermissionName } from 'src/auth/dto/permission-name.enum';
-
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+@ApiTags('permissions')
+@ApiBearerAuth()
 @Controller('permissions')
 export class PermissionController {
   constructor(private readonly permissionsService: PermissionsService) {}

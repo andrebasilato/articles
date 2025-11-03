@@ -9,7 +9,9 @@ import { CurrentUser } from "src/auth/decorators/current-user.decorator";
 import { CurrentUserDto } from "src/auth/dto/current-user.dto";
 import { CreateArticleDto } from "./dto/create-article.dto";
 import { UpdateArticleDto } from "./dto/update-article.dto";
-
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
+@ApiTags('articles')
+@ApiBearerAuth()
 @Controller('articles')
 export class ArticleController {
   constructor(private readonly articlesService: ArticlesService) {}
