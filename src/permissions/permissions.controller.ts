@@ -8,7 +8,9 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 class CreatePermissionDto {
   name!: string;
@@ -20,21 +22,31 @@ class UpdatePermissionDto {
   description?: string;
 }
 
+import { Permissions } from 'src/auth/decorators/permissions.decorator';
+import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
+import { PermissionName } from 'src/auth/dto/permission-name.enum';
+
 @Controller('permissions')
 export class PermissionController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
   @Get()
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(PermissionName.Admin)
   async getPermissions() {
     return this.permissionsService.getPermissions();
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(PermissionName.Admin)
   async getPermissionById(@Param('id') id: string): Promise<Permission | null> {
     return this.permissionsService.getPermissionById(parseInt(id));
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(PermissionName.Admin)
   async createPermission(
     @Body() data: CreatePermissionDto,
   ): Promise<Permission> {
@@ -45,6 +57,8 @@ export class PermissionController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(PermissionName.Admin)
   async updatePermission(
     @Param('id') id: string,
     @Body() data: UpdatePermissionDto,
@@ -53,6 +67,8 @@ export class PermissionController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(PermissionName.Admin)
   async deletePermission(@Param('id') id: string): Promise<Permission> {
     return this.permissionsService.deletePermission(parseInt(id));
   }

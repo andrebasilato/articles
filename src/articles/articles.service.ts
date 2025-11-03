@@ -14,11 +14,18 @@ export class ArticlesService {
     return this.prisma.article.findFirst({ where: { id, deletedAt: null } });
   }
 
-  async createArticle(data: Article): Promise<Article> {
+  async createArticle(data: {
+    title: string;
+    content: string;
+    authorId: number;
+  }): Promise<Article> {
     return this.prisma.article.create({ data });
   }
 
-  async updateArticle(id: number, data: Article): Promise<Article> {
+  async updateArticle(
+    id: number,
+    data: Partial<{ title: string; content: string }>,
+  ): Promise<Article> {
     return this.prisma.article.update({ where: { id }, data });
   }
 

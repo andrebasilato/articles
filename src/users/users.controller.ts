@@ -8,34 +8,36 @@ import {
   Put,
   NotFoundException,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './users.service';
 import { User } from '@prisma/client';
-
-class CreateUserDto {
-  name!: string;
-  email!: string;
-  password!: string;
-  permissionId!: number;
-}
-
-class UpdateUserDto {
-  name?: string;
-  email?: string;
-  password?: string;
-  permissionId?: number;
-}
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { CurrentUserDto } from 'src/auth/dto/current-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { Permissions } from 'src/auth/decorators/permissions.decorator';
+import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
+import { PermissionName } from 'src/auth/dto/permission-name.enum';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get()
-  async getUsers() {
-    return this.userService.getUsers();
+  @Get('')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(PermissionName.Admin)
+  async getUsers(@CurrentUser() user: CurrentUserDto) {
+    return {
+      me: user,
+      users: await this.userService.getUsers(),
+    };
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(PermissionName.Admin)
   async getUserById(@Param('id') id: string): Promise<User | null> {
     const user = await this.userService.getUserById(parseInt(id));
     if (!user) {
@@ -45,11 +47,15 @@ export class UserController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(PermissionName.Admin)
   async createUser(@Body() data: CreateUserDto): Promise<User> {
     return this.userService.createUser(data);
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(PermissionName.Admin)
   async updateUser(
     @Param('id') id: string,
     @Body() data: UpdateUserDto,
@@ -58,6 +64,8 @@ export class UserController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(PermissionName.Admin)
   async deleteUser(@Param('id') id: string): Promise<User> {
     try {
       return await this.userService.deleteUser(parseInt(id));
