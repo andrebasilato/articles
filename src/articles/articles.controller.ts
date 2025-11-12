@@ -10,6 +10,7 @@ import { CurrentUserDto } from "src/auth/dto/current-user.dto";
 import { CreateArticleDto } from "./dto/create-article.dto";
 import { UpdateArticleDto } from "./dto/update-article.dto";
 import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
+import { ArticleOwnershipGuard } from './guards/article-ownership.guard';
 @ApiTags('articles')
 @ApiBearerAuth()
 @Controller('articles')
@@ -45,7 +46,7 @@ export class ArticleController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @UseGuards(JwtAuthGuard, PermissionsGuard, ArticleOwnershipGuard)
   @Permissions(PermissionName.Admin, PermissionName.Editor)
   async updateArticle(
     @Param('id') id: string,
@@ -55,7 +56,7 @@ export class ArticleController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @UseGuards(JwtAuthGuard, PermissionsGuard, ArticleOwnershipGuard)
   @Permissions(PermissionName.Admin, PermissionName.Editor)
   async deleteArticle(@Param('id') id: string): Promise<Article> {
     return this.articlesService.deleteArticle(parseInt(id));
